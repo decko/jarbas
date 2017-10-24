@@ -1,5 +1,8 @@
+from io import StringIO
+
 from django.test import TestCase
 from mixer.backend.django import mixer
+from unittest.mock import patch
 
 from jarbas.core.models import Reimbursement
 from jarbas.core.tasks import (
@@ -102,3 +105,15 @@ class TestCreateOrUpdateTask(TestCase):
 
         create_or_update_reimbursement(self.csv_row_as_dict)
         self.assertEqual(1, Reimbursement.objects.count())
+
+
+class TestFileLoader(TestCase):
+
+    @patch('jarbas.core.tasks.reimbursements.lzma')
+    @patch('jarbas.core.tasks.reimbursements.csv.DictReader')
+    def test_reimbursement_property(self, row, lzma):
+        lzma.return_value = StringIO()
+        row.return_value = dict(ahoy=42)
+        self.command.path = 'reimbursements.xz'
+        reimbursements = tuple(self.command.reimbursements)
+        self.assertEqual(1, len(reimbursements))
