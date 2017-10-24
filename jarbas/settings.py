@@ -193,3 +193,4 @@ CACHES = {
 # Queue
 
 CELERY_BROKER_URL = config('CELERY_BROKER_URL', default='amqp://guest:guest@localhost//')
+CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND', default='amqp://guest:guest@localhost//')
